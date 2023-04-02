@@ -1,0 +1,19 @@
+[package]
+name = "boids_test"
+version = "0.1.0"
+authors = ["Pierre-Olivier Tremblay"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0"
+getrandom = { version = "0.2" , features = ["js"]}
+rand = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+yew = { version = "0.20", features = ["csr"] }
+gloo = "0.8"
+
+[dependencies.web-sys]
+version = "0.3"
+features = [ "HtmlInputElement" ]
