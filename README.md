@@ -1,2 +1,2 @@
 # Tauri_Yew_Tests
-Ceci est pour me pratiquer avec le frontend en utilisant Yew.
+Le but de ce projet est de me pratiquer avec Yew pour créer des GUI qui utilisent le frontend pour au final avoir un template qui pourrait être utilisé.
