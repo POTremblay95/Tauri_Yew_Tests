@@ -46,5 +46,48 @@ impl Component for Slider {
         unimplemented!()
     }
 
-    fn view(&self)
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let Props {
+            label,
+            value,
+            ref onchange,
+            precision,
+            min,
+            max,
+            step,
+        } = *ctx.props();
+
+        let precision = precision.unwrap_or_else(|| usize::from(percentage));
+
+        let display_value = if percentage {
+            format!("{:.p$}%", 100.0 * value, p = precision)
+        } else {
+            format!("{:.p$}", value, p = precision)
+        };
+
+        let id = format!("slider-{}", self.id);
+        let step = step.unwrap_or_else(|| {
+            let p = if percentage { precision + 2 } else { precision };
+            10f64.powi(-(p as i32))
+        });
+
+        let oninput = onchange.reform(|e: InputEvent| {
+            let input: HtmlInputElement = e.target_unchecked_into();
+            input.value_as_number()
+        });
+
+        html! {
+            <div class="slider">
+                <label for={id.clone()} class="slider__label">{label}</label>
+                <input type="range"
+                    value={value.to_string()}
+                    {id}
+                    class="slider__input"
+                    min={min.to_string()} max={max.to_string()} step={step.to_string()}
+                    {oninput}
+                />
+                <span class="slider__value">{display_value}</span>
+            </div>
+        }
+    }
 }
