@@ -16,7 +16,7 @@ pub struct Settings {
     /// force multiplier for pulling boids together
     pub cohesion_factor: f64,
     /// force multiplier for separating boids
-    pub seperation_factor: f64,
+    pub separation_factor: f64,
     /// force multiplier for matching velocity of other boids
     pub alignment_factor: f64,
     /// controls turn speed to avoid leaving boundary
@@ -53,7 +53,7 @@ impl Default for Settings {
             max_speed: 20.0,
             alignment_factor: 0.15,
             cohesion_factor: 0.05,
-            seperation_factor: 0.6,
+            separation_factor: 0.6,
             turn_speed_ratio: 0.25,
             border_margin: 0.1,
             color_adapt_factor: 0.05,

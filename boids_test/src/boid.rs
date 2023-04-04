@@ -1,4 +1,4 @@
-use std::fmt::Writer;
+use std::fmt::Write;
 use std::iter;
 
 use rand::Rng;
@@ -85,7 +85,7 @@ impl Boid {
         if pos.x < min.x {
             v.x += turn_speed;
         }
-        if pox.x > max.x {
+        if pos.x > max.x {
             v.x -= turn_speed;
         }
 
@@ -103,18 +103,18 @@ impl Boid {
         let v = self.velocity
             + self.coherence(boids.clone(), settings.cohesion_factor)
             + self.separation(boids.clone(), settings)
-            + self.alignment(boids, settingds.alignment_factor);
+            + self.alignment(boids, settings.alignment_factor);
         self.velocity = v.clamp_magnitude(settings.max_speed);
     }
 
-    fn update(&mut self, settings: &Settings, boid: VisibleBoidIter) {
+    fn update(&mut self, settings: &Settings, boids: VisibleBoidIter) {
         self.adapt_color(boids.clone(), settings.color_adapt_factor);
         self.update_velocity(settings, boids);
         self.keep_in_bounds(settings);
         self.position += self.velocity;
     }
 
-    fn update_all(settings: &Settings, boids: &mut [Self]) {
+    pub fn update_all(settings: &Settings, boids: &mut [Self]) {
         for i in 0..boids.len() {
             let (before, after) = boids.split_at_mut(i);
             let (boid, after) = after.split_first_mut().unwrap();
@@ -125,43 +125,43 @@ impl Boid {
         }
     }
 
-    pub fn render(&self) -> Html{
+    pub fn render(&self) -> Html {
         let color = format!("hsl({:.3}rad, 100%, 50%)", self.hue);
 
         let mut points = String::new();
-        for offset in iter_shape_points(self.radius, self.velocity.angle()){
-            let Vector2D{x,y}=self.position+offset;
+        for offset in iter_shape_points(self.radius, self.velocity.angle()) {
+            let Vector2D { x, y } = self.position + offset;
 
             //Write string will never fail
-            let _ = write!(points, "{:.2},{:.2}",x , y)
+            let _ = write!(points, "{:.2},{:.2} ", x, y);
         }
 
-        html!{<polygon {points} fill={color}/>}
+        html! {<polygon {points} fill={color}/>}
     }
 }
 
-fn iter_shape_points(radius: f64, rotation: f64) -> impl Iterator<Item=Vector2D>{
+fn iter_shape_points(radius: f64, rotation: f64) -> impl Iterator<Item = Vector2D> {
     const SHAPE: [(f64, f64); 3] = [
-        (0.*math::FRAC_TAU_3, 2.0),
-        (1.*math::FRAC_TAU_3, 1.0),
-        (2.*math::FRAC_TAU_3, 1.0),
+        (0. * math::FRAC_TAU_3, 2.0),
+        (1. * math::FRAC_TAU_3, 1.0),
+        (2. * math::FRAC_TAU_3, 1.0),
     ];
 
     SHAPE
-    .iter()
-    .copied()
-    .map(move |(angle, radius_mul)| Vector2D::from_polar(angle+rotation, radius_mul*radius))
+        .iter()
+        .copied()
+        .map(move |(angle, radius_mul)| Vector2D::from_polar(angle + rotation, radius_mul * radius))
 }
 
 #[derive(Debug)]
-struct VisibleBoid<'a>{
+struct VisibleBoid<'a> {
     boid: &'a Boid,
     offset: Vector2D,
     distance: f64,
 }
 
 #[derive(Clone, Debug)]
-struct VisibleBoidIter<'boid>{
+struct VisibleBoidIter<'boid> {
     // Pay no mind to this mess of a type
     //It's just 'before' and 'after' joined together
     it: iter::Chain<std::slice::Iter<'boid, Boid>, std::slice::Iter<'boid, Boid>>,
@@ -169,14 +169,14 @@ struct VisibleBoidIter<'boid>{
     visible_range: f64,
 }
 
-impl<'boid> VisibleBoidIter<'boid>{
+impl<'boid> VisibleBoidIter<'boid> {
     fn new(
         before: &'boid [Boid],
         after: &'boid [Boid],
         position: Vector2D,
-        visible_range: f64
-    ) -> Self{
-        Self{
+        visible_range: f64,
+    ) -> Self {
+        Self {
             it: before.iter().chain(after),
             position,
             visible_range,
@@ -184,24 +184,24 @@ impl<'boid> VisibleBoidIter<'boid>{
     }
 }
 
-impl<'boid> Iterator for VisibleBoidIter<'boid>{
+impl<'boid> Iterator for VisibleBoidIter<'boid> {
     type Item = VisibleBoid<'boid>;
 
-    fn next(&mut self)->Option<Self::Item>{
-        let Self{
+    fn next(&mut self) -> Option<Self::Item> {
+        let Self {
             ref mut it,
             position,
             visible_range,
         } = *self;
 
-        it.find_map(move |other|{
-            let offset = other.position-position;
+        it.find_map(move |other| {
+            let offset = other.position - position;
             let distance = offset.magnitude();
 
-            if distance > visible_range{
+            if distance > visible_range {
                 None
-            } else{
-                Some(VisibleBoid{
+            } else {
+                Some(VisibleBoid {
                     boid: other,
                     offset,
                     distance,

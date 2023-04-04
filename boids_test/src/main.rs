@@ -100,7 +100,7 @@ impl App {
         // "ChangeBoids", "ChangeCohesion", etc. messages, but it comes at the cost of
         // cloning the 'Settings' struct each time.
         macro_rules! settings_callback {
-            ($link:expr, $setting:ident; $key:ident as $ty:ty) => {{
+            ($link:expr, $settings:ident; $key:ident as $ty:ty) => {{
                 let settings = $settings.clone();
                 $link.callback(move |value| {
                     let mut settings = settings.clone();
@@ -108,18 +108,45 @@ impl App {
                     Msg::ChangeSettings(settings)
                 })
             }};
-
-            ($link:expr, &settings:ident; $key:ident)=>{
+            ($link:expr, $settings:ident; $key:ident) => {
                 settings_callback!($link, $settings; $key as f64)
             }
         }
-    }
 
-    html! {
-        <div class="settings">
-            <Slider label="Number of Boids" min=1.0 max=600.0
-            onchange={settings_callback!(link, settings; boids as usize)}
-            value={settings.boids as f64}/>
-        </div>
+        html! {
+            <div class="settings">
+                <Slider label="Number of Boids" min=1.0 max=600.0
+                onchange={settings_callback!(link, settings; boids as usize)}
+                value={settings.boids as f64}/>
+                <Slider label="View Distance" min=500.0 max=10.0
+                onchange={settings_callback!(link, settings; visible_range)}
+                value={settings.visible_range}/>
+                <Slider label="Spacing" max=100.0
+                onchange={settings_callback!(link, settings; min_distance)}
+                value={settings.min_distance}/>
+                <Slider label="Max Speed" max=50.0
+                onchange={settings_callback!(link, settings; max_speed)}
+                value={settings.max_speed}/>
+                <Slider label="Cohesion" max=0.5 percentage=true
+                onchange={settings_callback!(link, settings; cohesion_factor)}
+                value={settings.cohesion_factor}/>
+                <Slider label="Sepetation" max=1.0 percentage=true
+                onchange={settings_callback!(link, settings; separation_factor)}
+                value={settings.separation_factor}/>
+                <Slider label="Alignement" max=0.5 percentage=true
+                onchange={settings_callback!(link, settings; alignment_factor)}
+                value={settings.alignment_factor}/>
+                <Slider label="Turn Speed" max=1.5 percentage=true
+                onchange={settings_callback!(link, settings; turn_speed_ratio)}
+                value={settings.turn_speed_ratio}/>
+                <Slider label="Color Adaption" max=1.5
+                onchange={settings_callback!(link, settings; color_adapt_factor)}
+                value={settings.color_adapt_factor}/>
+            </div>
+        }
     }
+}
+
+fn main() {
+    yew::Renderer::<App>::new().render();
 }

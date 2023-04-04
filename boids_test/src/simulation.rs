@@ -101,7 +101,7 @@ impl Component for Simulation {
         }
     }
 
-    fn vuew(&self, _ctx: &Context<Self>) -> Html {
+    fn view(&self, _ctx: &Context<Self>) -> Html {
         let view_box = format!("0 0 {} {}", SIZE.x, SIZE.y);
 
         html! {

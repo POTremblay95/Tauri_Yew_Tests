@@ -52,6 +52,7 @@ impl Component for Slider {
             value,
             ref onchange,
             precision,
+            percentage,
             min,
             max,
             step,

@@ -34,7 +34,7 @@ impl Vector2D {
     }
 
     pub fn magnitude(self) -> f64 {
-        self.magnitude_squared.sqrt()
+        self.magnitude_squared().sqrt()
     }
 
     /// Return a copy of this vector so its magnitude is at most 'max'
@@ -119,7 +119,7 @@ impl DivAssign<f64> for Vector2D {
 impl Div<f64> for Vector2D {
     type Output = Self;
 
-    fn div(mut self, rhs: f64) {
+    fn div(mut self, rhs: f64) -> Self::Output {
         self /= rhs;
         self
     }
@@ -137,7 +137,7 @@ pub trait WeightedMean<T = Self>: Sized {
 
 impl<T> WeightedMean for T
 where
-    T: AddAssign + Mul<f64, Ouput = T> + Div<f64, Ouput = T> + Copy + Default,
+    T: AddAssign + Mul<f64, Output = T> + Div<f64, Output = T> + Copy + Default,
 {
     fn weighted_mean(it: impl Iterator<Item = (T, f64)>) -> Option<T> {
         let (sum, total_weight) = it.fold(
