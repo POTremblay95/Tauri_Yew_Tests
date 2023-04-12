@@ -37,7 +37,7 @@ impl Boid {
         Vector2D::weighted_mean(
             boids.map(|other| (other.boid.position, other.boid.radius * other.boid.radius)),
         )
-        .map(|mean| (mean - self.position * factor))
+        .map(|mean| (mean - self.position) * factor)
         .unwrap_or_default()
     }
 
@@ -51,7 +51,6 @@ impl Boid {
                 }
             })
             .sum::<Vector2D>();
-
         accel * settings.separation_factor
     }
 
@@ -86,7 +85,7 @@ impl Boid {
             v.x += turn_speed;
         }
         if pos.x > max.x {
-            v.x -= turn_speed;
+            v.x -= turn_speed
         }
 
         if pos.y < min.y {
@@ -132,11 +131,11 @@ impl Boid {
         for offset in iter_shape_points(self.radius, self.velocity.angle()) {
             let Vector2D { x, y } = self.position + offset;
 
-            //Write string will never fail
+            // Write to string will never fail.
             let _ = write!(points, "{:.2},{:.2} ", x, y);
         }
 
-        html! {<polygon {points} fill={color}/>}
+        html! { <polygon {points} fill={color} /> }
     }
 }
 
@@ -146,7 +145,6 @@ fn iter_shape_points(radius: f64, rotation: f64) -> impl Iterator<Item = Vector2
         (1. * math::FRAC_TAU_3, 1.0),
         (2. * math::FRAC_TAU_3, 1.0),
     ];
-
     SHAPE
         .iter()
         .copied()
@@ -162,13 +160,12 @@ struct VisibleBoid<'a> {
 
 #[derive(Clone, Debug)]
 struct VisibleBoidIter<'boid> {
-    // Pay no mind to this mess of a type
-    //It's just 'before' and 'after' joined together
+    // Pay no mind to this mess of a type.
+    // It's just `before` and `after` joined together.
     it: iter::Chain<std::slice::Iter<'boid, Boid>, std::slice::Iter<'boid, Boid>>,
     position: Vector2D,
     visible_range: f64,
 }
-
 impl<'boid> VisibleBoidIter<'boid> {
     fn new(
         before: &'boid [Boid],
@@ -183,7 +180,6 @@ impl<'boid> VisibleBoidIter<'boid> {
         }
     }
 }
-
 impl<'boid> Iterator for VisibleBoidIter<'boid> {
     type Item = VisibleBoid<'boid>;
 
